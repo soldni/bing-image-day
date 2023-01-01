@@ -1,4 +1,6 @@
-on: workflow_dispatch
+on: 
+  schedule:
+    - cron: '15 2 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
