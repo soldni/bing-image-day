@@ -10,9 +10,14 @@ def main():
     with urllib.request.urlopen(req) as response:
         data = json.loads(response.read())
         url = 'http://www.bing.com' + data['images'][0]['url']
+        title = data['images'][0]['title']
         with open('template.html', 'r') as f, \
                 open('docs/index.html', 'w') as f2:
-            template = f.read().replace('INSERT_URL_HERE', url)
+            template = (
+                f.read()
+                .replace('INSERT_URL_HERE', url)
+                .replace('INSERT_TITLE_HERE', title)
+            )
             f2.write(template)
 
 
