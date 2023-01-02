@@ -1,14 +1,15 @@
 on: 
   schedule:
-    - cron: '15 2 * * *'
+    # time is UTC, so 10 AM UTC -> 2 AM PST
+    - cron: '0 10 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
       with:
-        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
-        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+        persist-credentials: false 
+        fetch-depth: 0 
     - name: Run script to update image
       run: python deploy.py
     - name: Commit & Push changes
