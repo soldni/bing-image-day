@@ -6,37 +6,160 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>INSERT_TITLE_HERE - Bing Image of The Day</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --glass-background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --glass-background: rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: black;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        #bing-day-image {
+            width: 100%;
+            height: 100vh;
+            object-fit: cover;
+            display: block;
+        }
+
+        .title-section {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: var(--glass-background);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+        }
+
+        #color-sampler {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            visibility: hidden;
+        }
+    </style>
 </head>
-
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-    }
-
-    .container {
-        width: 100%;
-        margin: 0 auto;
-    }
-
-    h1 {
-        font-family: sans-serif;
-        margin-top: -.3em;
-        text-align: center;
-    }
-
-    div#bing-day-image {
-        content: url('INSERT_URL_HERE');
-        width: 100%;
-        margin: auto;
-    }
-
-</style>
 
 <body>
     <div class="container">
-        <div id="bing-day-image"></div>​
+        <img id="bing-day-image" src="INSERT_URL_HERE"
+            alt="INSERT_TITLE_HERE">
+        <canvas id="color-sampler"></canvas>
+        <div class="title-section">
+            <h1>INSERT_TITLE_HERE</h1>
+        </div>
     </div>
+
+    <script>
+        function getLuminance(r, g, b) {
+            // Convert to sRGB first
+            r = r / 255;
+            g = g / 255;
+            b = b / 255;
+
+            r = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+            g = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+            b = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+
+        function getAverageColor(img) {
+            const canvas = document.getElementById('color-sampler');
+            const ctx = canvas.getContext('2d');
+
+            // Sample the bottom 20% of the image
+            const sampleHeight = img.height * 0.2;
+            canvas.width = img.width;
+            canvas.height = sampleHeight;
+
+            ctx.drawImage(img, 0, -img.height + sampleHeight, img.width, img.height);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            let r = 0, g = 0, b = 0;
+            const pixels = data.length / 4;
+
+            for (let i = 0; i < data.length; i += 4) {
+                r += data[i];
+                g += data[i + 1];
+                b += data[i + 2];
+            }
+
+            r = Math.round(r / pixels);
+            g = Math.round(g / pixels);
+            b = Math.round(b / pixels);
+
+            return { r, g, b };
+        }
+
+        function adjustTextColor() {
+            const img = document.getElementById('bing-day-image');
+            const heading = document.querySelector('h1');
+
+            const avgColor = getAverageColor(img);
+            const luminance = getLuminance(avgColor.r, avgColor.g, avgColor.b);
+
+            // Choose white or black text based on background luminance
+            const textColor = luminance > 0.5 ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+            heading.style.color = textColor;
+        }
+
+        window.onload = function () {
+            const img = document.getElementById('bing-day-image');
+            if (img.complete) {
+                adjustTextColor();
+            } else {
+                img.onload = adjustTextColor;
+            }
+        };
+
+        // Adjust text color on window resize (in case image dimensions change)
+        window.addEventListener('resize', adjustTextColor);
+    </script>
 </body>
 
 </html>
+
+
