@@ -62,7 +62,10 @@ def get_aic_artwork(artwork: dict) -> tuple[str, str]:
         print(f"Artwork ID: {artwork['id']} already exists; skipping download...")
         with open(f'{BASE_STORAGE_PATH}/aic/metadata/{artwork["id"]}.json', 'r') as f:
             data = json.load(f)
-        return f'{BASE_STORAGE_PATH}/aic/images/{artwork["id"]}.jpg', f'{data["title"]} by {data["artist_display"]}'
+
+        title = data['title'].replace('\n', ' ').strip()
+        artist = data['artist_display'].replace('\n', ' ').strip()
+        return f'{BASE_STORAGE_PATH}/aic/images/{artwork["id"]}.jpg', f'{title} by {artist}'
 
     # proceed to download image
     req = Request(url=artwork['api_link'] + '?fields=id,title,artist_display,date_display,image_id,thumbnail')
