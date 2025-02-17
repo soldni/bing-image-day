@@ -5,6 +5,11 @@ import os
 import random
 from time import sleep
 from urllib.request import Request, urlopen, urlretrieve
+import shutil
+
+
+BASE_STORAGE_PATH = 'storage'
+BASE_DEPLOY_PATH = 'docs'
 
 
 def get_aic_search_public_domain(
@@ -53,11 +58,11 @@ def get_aic_artworks(
 
 def get_aic_artwork(artwork: dict) -> tuple[str, str]:
     # check if artwork exists
-    if os.path.exists(f'docs/images/{artwork["id"]}.jpg'):
+    if os.path.exists(f'{BASE_STORAGE_PATH}/aic/images/{artwork["id"]}.jpg'):
         print(f"Artwork ID: {artwork['id']} already exists; skipping download...")
-        with open(f'docs/metadata/{artwork["id"]}.json', 'r') as f:
+        with open(f'{BASE_STORAGE_PATH}/aic/metadata/{artwork["id"]}.json', 'r') as f:
             data = json.load(f)
-        return f'docs/images/{artwork["id"]}.jpg', f'{data["title"]} by {data["artist_display"]}'
+        return f'{BASE_STORAGE_PATH}/aic/images/{artwork["id"]}.jpg', f'{data["title"]} by {data["artist_display"]}'
 
     # proceed to download image
     req = Request(url=artwork['api_link'] + '?fields=id,title,artist_display,date_display,image_id,thumbnail')
@@ -77,10 +82,10 @@ def get_aic_artwork(artwork: dict) -> tuple[str, str]:
     caption = f'{title} by {artist}'
     print(f"Found artwork ID: {data['id']}; downloading image from {url} ...")
 
-    # Download image to `docs/images` folder
-    path = f'docs/images/{data["id"]}.jpg'
+    # Download image to `{BASE_STORAGE_PATH}/images` folder
+    path = f'{BASE_STORAGE_PATH}/aic/images/{data["id"]}.jpg'
     urlretrieve(url, path)
-    with open(f'docs/metadata/{data["id"]}.json', 'w') as f:
+    with open(f'{BASE_STORAGE_PATH}/aic/metadata/{data["id"]}.json', 'w') as f:
         json.dump(data, f, indent=2)
 
     return path, caption
@@ -126,7 +131,7 @@ def main_bing():
         url = 'https://www.bing.com' + data['images'][0]['url']
         title = data['images'][0]['title']
         with open('template.html', 'r') as f, \
-                open('docs/index.html', 'w') as f2:
+                open(f'{BASE_DEPLOY_PATH}/index.html', 'w') as f2:
             template = (
                 f.read()
                 .replace('INSERT_URL_HERE', url)
@@ -142,13 +147,15 @@ def main_art():
     ap.add_argument('-m', '--max-offset', type=int, default=10)
     args = ap.parse_args()
 
-    path, caption = aic_image(offset=args.seed, max_offset=args.max_offset+args.seed)
-    path = path.replace('docs/', '')
+    storage_path, caption = aic_image(offset=args.seed, max_offset=args.max_offset+args.seed)
+    deploy_image_path = f'{BASE_DEPLOY_PATH}/image.jpg'
+    shutil.copy2(storage_path, deploy_image_path)
+
     with open('template.html', 'r') as f, \
-            open('docs/index.html', 'w') as f2:
+            open(f'{BASE_DEPLOY_PATH}/index.html', 'w') as f2:
         template = (
             f.read()
-            .replace('INSERT_URL_HERE', path)
+            .replace('INSERT_URL_HERE', deploy_image_path)
             .replace('INSERT_TITLE_HERE', caption)
             .replace('INSERT_SOURCE_HERE', 'Art Institute of Chicago')
         )
