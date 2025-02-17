@@ -180,7 +180,7 @@
             const imageRatio = img.naturalWidth / img.naturalHeight;
 
             // Check if the image's ratio is significantly different from the device's.
-            if (imageRatio < deviceRatio * 0.7 || imageRatio > deviceRatio * 1.3) {
+            if (imageRatio < deviceRatio * 0.9 || imageRatio > deviceRatio * 1.1) {
                 bgImage.style.backgroundImage = `url(${img.src})`;
                 bgImage.style.display = 'block';
 
@@ -193,7 +193,7 @@
                 if (imageRatio < deviceRatio) {
                     // force its height to 100% (image is portrait; device is landscape)
                     img.style.width = 'auto';
-                    img.style.height = '100%';
+                    img.style.height = '100vh';
                     img.style.maxHeight = '';
                 } else {
                     // force its width to 100% (image is landscape; device is portrait)

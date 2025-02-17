@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import datetime
 import json
+import os
 import random
 from time import sleep
 from urllib.request import Request, urlopen, urlretrieve
@@ -37,7 +38,7 @@ def get_aic_artworks(
 ) -> tuple[int, list[dict]]:
 
     req = Request(
-        url=f'{url}?page={page * limit}&limit={limit}&fields=api_link',
+        url=f'{url}?page={page * limit}&limit={limit}&fields=api_link,id',
         headers={'Content-Type': 'application/json'},
         method='GET'
     )
@@ -51,7 +52,14 @@ def get_aic_artworks(
 
 
 def get_aic_artwork(artwork: dict) -> tuple[str, str]:
+    # check if artwork exists
+    if os.path.exists(f'docs/images/{artwork["id"]}.jpg'):
+        print(f"Artwork ID: {artwork['id']} already exists; skipping download...")
+        with open(f'docs/metadata/{artwork["id"]}.json', 'r') as f:
+            data = json.load(f)
+        return f'docs/images/{artwork["id"]}.jpg', f'{data["title"]} by {data["artist_display"]}'
 
+    # proceed to download image
     req = Request(url=artwork['api_link'] + '?fields=id,title,artist_display,date_display,image_id,thumbnail')
     with urlopen(req) as response:
         content = json.loads(response.read())
