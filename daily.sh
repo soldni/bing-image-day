@@ -15,6 +15,7 @@ CURRENT=$(pwd)
 
 cd $SCRIPT_DIR
 python deploy.py
+git add .
 git commit -am "Image refresh - $(date)"
 git push
 cd $CURRENT
