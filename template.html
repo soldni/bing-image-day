@@ -205,7 +205,9 @@
                 // Adjust the title-section to be 20 pixels narrower than the displayed image.
                 requestAnimationFrame(() => {
                     const imgRect = img.getBoundingClientRect();
-                    titleSection.style.width = (imgRect.width - 20) + 'px';
+
+                    const bottomMargin = titleSection.style.bottom / 2;
+                    titleSection.style.width = (imgRect.width - bottomMargin) + 'px';
                     titleSection.style.left = '50%';
                     titleSection.style.transform = 'translateX(-50%)';
                 });

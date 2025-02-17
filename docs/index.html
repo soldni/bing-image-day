@@ -118,7 +118,7 @@
     <div class="container">
         <!-- Blurred background element -->
         <div id="bg-image"></div>
-        <img id="bing-day-image" src="docs/image.jpg" alt="Portrait Bust of Comtesse d'Affry, née Lucie de Maillardoz (1816-1897) by Jean Baptiste Carpeaux (French, 1827–1875)">
+        <img id="bing-day-image" src="image.jpg" alt="Portrait Bust of Comtesse d'Affry, née Lucie de Maillardoz (1816-1897) by Jean Baptiste Carpeaux (French, 1827–1875)">
         <canvas id="color-sampler"></canvas>
         <div class="title-section">
             <h1>Portrait Bust of Comtesse d'Affry, née Lucie de Maillardoz (1816-1897) by Jean Baptiste Carpeaux (French, 1827–1875)</h1>
@@ -205,7 +205,9 @@
                 // Adjust the title-section to be 20 pixels narrower than the displayed image.
                 requestAnimationFrame(() => {
                     const imgRect = img.getBoundingClientRect();
-                    titleSection.style.width = (imgRect.width - 20) + 'px';
+
+                    const bottomMargin = titleSection.style.bottom / 2;
+                    titleSection.style.width = (imgRect.width - bottomMargin) + 'px';
                     titleSection.style.left = '50%';
                     titleSection.style.transform = 'translateX(-50%)';
                 });

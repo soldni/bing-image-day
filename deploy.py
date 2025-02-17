@@ -158,7 +158,7 @@ def main_art():
             open(f'{BASE_DEPLOY_PATH}/index.html', 'w') as f2:
         template = (
             f.read()
-            .replace('INSERT_URL_HERE', deploy_image_path)
+            .replace('INSERT_URL_HERE', 'image.jpg')
             .replace('INSERT_TITLE_HERE', caption)
             .replace('INSERT_SOURCE_HERE', 'Art Institute of Chicago')
         )
