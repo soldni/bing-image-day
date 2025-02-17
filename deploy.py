@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import datetime
 import json
 import random
@@ -77,7 +78,7 @@ def get_aic_artwork(artwork: dict) -> tuple[str, str]:
     return path, caption
 
 
-def aic_image(offset=0):
+def aic_image(offset=0, max_offset=10):
     try:
         # seed is today's date in YYYYMMDD format
         random.seed(int(datetime.datetime.now().strftime('%Y%m%d')) + offset)
@@ -101,11 +102,11 @@ def aic_image(offset=0):
         return get_aic_artwork(artwork)
 
     except Exception as e:
-        if offset < 10:
+        if offset < max_offset:
             # sleep between 1 and 5 seconds before retrying
             sleep(random.random() * 4 + 1)
             # Retry up to 10 times
-            return aic_image(offset + 1)
+            return aic_image(offset + 1, max_offset)
         else:
             raise e
 
@@ -128,7 +129,12 @@ def main_bing():
 
 
 def main_art():
-    path, caption = aic_image()
+    ap = ArgumentParser()
+    ap.add_argument('-s', '--seed', type=int, default=0)
+    ap.add_argument('-m', '--max-offset', type=int, default=10)
+    args = ap.parse_args()
+
+    path, caption = aic_image(offset=args.seed, max_offset=args.max_offset+args.seed)
     path = path.replace('docs/', '')
     with open('template.html', 'r') as f, \
             open('docs/index.html', 'w') as f2:
