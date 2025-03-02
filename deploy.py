@@ -165,5 +165,9 @@ def main_art():
         f2.write(template)
 
 
+def just_random():
+    with open('random.html', 'r') as f, open(f'{BASE_DEPLOY_PATH}/index.html', 'w') as f2:
+        f2.write(f.read())
+
 if __name__ == '__main__':
-    main_art()
+    just_random()
