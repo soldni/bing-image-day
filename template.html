@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>INSERT_TITLE_HERE - INSERT_SOURCE_HERE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="refresh" content="3600" />
     <style>
         :root {
             --glass-background: rgba(255, 255, 255, 0.1);
@@ -241,6 +242,32 @@
                 }
             }
         };
+
+        // Hide title-section after 5 seconds
+        setTimeout(() => {
+            const titleSection = document.querySelector('.title-section');
+            if (titleSection) {
+                titleSection.style.opacity = '0';
+                titleSection.style.transition = 'opacity 0.5s ease-out';
+
+                // Show title on hover/touch
+                document.body.addEventListener('mousemove', showTitleOnInteraction);
+                document.body.addEventListener('touchstart', showTitleOnInteraction);
+            }
+        }, 5000);
+
+        function showTitleOnInteraction() {
+            const titleSection = document.querySelector('.title-section');
+            if (titleSection) {
+                titleSection.style.opacity = '1';
+
+                // Hide again after 3 seconds of inactivity
+                clearTimeout(window.titleTimeout);
+                window.titleTimeout = setTimeout(() => {
+                    titleSection.style.opacity = '0';
+                }, 3000);
+            }
+        }
 
         // Update display mode on window resize.
         window.addEventListener('resize', updateDisplayMode);
